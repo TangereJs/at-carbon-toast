@@ -1,0 +1,49 @@
+<link rel="import" href="../tangere/tangere.html" />
+
+
+<dom-module id="izi-toast-template">
+  <style>
+   .iziToast {    
+    background-color: var(--paper-toast-background-color, #323232);
+    color: var(--paper-toast-color, #f1f1f1);
+    min-height: 48px;
+    min-width: 288px;
+    padding: 16px 24px;
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
+    border-radius: 2px;
+    margin: 12px;
+    font-size: 14px;
+    cursor: default;
+    @apply(--paper-font-common-base);
+  }
+
+  #buttonClose {
+    display: none;
+  }
+  </style>
+  <template>
+    <div id="toastCapsule">
+      <div id="toast">
+        <div id="toastBody"><strong id="strong"></strong>
+          <p id="p"></p>
+        </div>
+        <button id="buttonClose"><i id="icon"></i></button>
+        <div id="progressBar">
+          <div id="progressBarDiv"></div>
+        </div>
+        <div id="buttons"></div>
+      </div>
+    </div>
+  </template>
+</dom-module>
+<script>
+Polymer({
+  is: "izi-toast-template",
+  properties: {
+
+  },
+  ready: function() {
+
+  }
+});
+</script>

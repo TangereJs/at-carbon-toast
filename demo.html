@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>demo at-carbon-toast</title>
+  <script src="../webcomponentsjs/webcomponents-lite.js"></script>
+  <link rel="import" href="../at-theme/at-theme.html" />
+  <link rel="import" href="at-carbon-toast.html" />
+</head>
+
+<body class="layout horizontal">
+  <div class="flex-4"></div>
+  <div class="flex-4">
+    <h4>at-carbon-toast demo page</h4>
+    <button id="showToast" onclick="showToast();">Show toast</button>
+    <button id="hideToast" onclick="hideToast();">Hide toast</button>
+    <at-carbon-toast id="carbonToast" text="Lorem ipsum"></at-carbon-toast>
+  </div>
+  <div class="flex-4"></div>
+
+  <script>
+  function showToast() {
+    var carbonToast = document.getElementById('carbonToast');
+    carbonToast.show();
+  }
+
+  function hideToast() {
+   var carbonToast = document.getElementById('carbonToast');
+    carbonToast.hide(); 
+  }
+  </script>
+</body>
+
+</html>
