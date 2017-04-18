@@ -1,0 +1,11 @@
+{
+  "name": "at-carbon-toast",
+  "private": true,
+  "version": "1.0.0.0",
+  "dependencies": {
+    "tangere": "TangereJs/tangere#master",
+    "iron-a11y-announcer": "PolymerElements/iron-a11y-announcer#master",
+    "iron-overlay-behavior": "PolymerElements/iron-overlay-behavior#master",
+    "at-doc-viewer": "TangereJs/at-doc-viewer#master"
+  }
+}
