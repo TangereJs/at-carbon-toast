@@ -143,6 +143,19 @@
         }
       }
 
+      function capfirst(value){
+        return value.charAt(0).toUpperCase() + value.slice(1);
+      }
+
+      var iziToastPosition = this.verticalAlign + capfirst(this.horizontalAlign);
+      iziToast.show({
+        message: this.text,
+        position: iziToastPosition,
+        close: false,
+        progressBar: false,
+        timeout: this.duration        
+      });
+
       this.open();
     },
 
@@ -150,10 +163,7 @@
      * Hide the toast. Same as `close()` from `IronOverlayBehavior`.
      */
     hide: function() {
-      var toast = document.querySelector('.iziToast');
-      if(toast) {
-        iziToast.hide({}, toast);
-      }
+      iziToast.destroy();
       
       this.close();
     },
@@ -189,19 +199,6 @@
         if (currentToast && currentToast !== this) {
           currentToast.close();
         }
-
-        function capfirst(value){
-          return value.charAt(0).toUpperCase() + value.slice(1);
-        }
-
-        var iziToastPosition = this.verticalAlign + capfirst(this.horizontalAlign);
-        iziToast.show({
-          message: this.text,
-          position: iziToastPosition,
-          close: false,
-          progressBar: false,
-          timeout: this.duration        
-        });
 
         currentToast = this;
         this.fire('iron-announce', {
