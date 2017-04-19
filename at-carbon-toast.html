@@ -60,6 +60,42 @@
       },
 
       /**
+       * Toast position on the screen.
+       * Possible values are bottomRight, bottomLeft, bottomCenter, topRight, topLeft, topCenter and center
+       *
+       * @property position
+       * @type String
+       * @default bottomLeft 
+       */
+      position: {
+        type: String,
+        value: 'bottomLeft',
+        xtype: 'enum',
+        xvaluelist:[{
+          title: "Bottom left",
+          value: "bottomLeft"
+        }, {
+          title: "Bottom right",
+          value: "bottomRight"
+        }, {
+          title: "Bottom center",
+          value: "bottomCenter"
+        }, {
+          title: "Top left",
+          value: "topLeft"
+        }, {
+          title: "Top right",
+          value: "topRight"
+        }, {
+          title: "Top center",
+          value: "topCenter"
+        }, {
+          title: "Center",
+          value: "center"
+        }]
+      },
+
+      /**
        * The duration in milliseconds to show the toast.
        * Set to `0`, a negative number, or `Infinity`, to disable the
        * toast auto-closing.
