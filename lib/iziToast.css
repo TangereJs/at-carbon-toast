@@ -99,10 +99,10 @@
 }
 .iziToast > .iziToast-body {
   position: relative;
-  padding: 0 0 0 10px;
+  /*padding: 0 0 0 10px;*/
   height: 100%;
   min-height: 36px;
-  margin: 0 0 0 16px;
+  /*margin: 0 0 0 16px;*/
 }
 .iziToast > .iziToast-body::after {
   content: "";

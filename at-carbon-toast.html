@@ -40,34 +40,15 @@
       },
 
       /**
-       * The orientation against which to align the dropdown content
-       * horizontally relative to `positionTarget`.
-       * Overridden from `Polymer.IronFitBehavior`.
-       */
-      horizontalAlign: {
-        type: String,
-        value: 'left'
-      },
-
-      /**
-       * The orientation against which to align the dropdown content
-       * vertically relative to `positionTarget`.
-       * Overridden from `Polymer.IronFitBehavior`.
-       */
-      verticalAlign: {
-        type: String,
-        value: 'bottom'
-      },
-
-      /**
        * Toast position on the screen.
        * Possible values are bottomRight, bottomLeft, bottomCenter, topRight, topLeft, topCenter and center
        *
-       * @property position
+       * @property toastPosition
        * @type String
        * @default bottomLeft 
        */
-      position: {
+       // position is renamed to toast position because ironfitbehavior has position function and that function takes over if toastPosition is named position
+      toastPosition: {
         type: String,
         value: 'bottomLeft',
         xtype: 'enum',
@@ -92,6 +73,50 @@
         }, {
           title: "Center",
           value: "center"
+        }]
+      },
+
+      /**
+       * animation used when toast is shown
+       * 
+       * @property showAnimation
+       * @type string
+       * @default fadeInUp
+       */
+      showAnimation: {
+        type: String,
+        value: "fadeInUp",
+        xtype: 'enum',
+        xvaluelist: [{
+          title: "bounceInLeft",
+          value: "bounceInLeft"
+        }, {
+          title: "bounceInRight",
+          value: "bounceInRight"
+        }, {
+          title: "bounceInUp",
+          value: "bounceInUp"
+        }, {
+          title: "bounceInDown",
+          value: "bounceInDown"
+        }, {
+          title: "fadeIn",
+          value: "fadeIn"
+        }, {
+          title: "fadeInDown",
+          value: "fadeInDown"
+        }, {
+          title: "fadeInUp",
+          value: "fadeInUp"
+        }, {
+          title: "fadeInLeft",
+          value: "fadeInLeft"
+        }, {
+          title: "fadeInRight",
+          value: "fadeInRight"
+        }, {
+          title: "flipInX",
+          value: "flipInX"
         }]
       },
 
@@ -179,20 +204,11 @@
         }
       }
 
-      function capfirst(value){
-        return value.charAt(0).toUpperCase() + value.slice(1);
+      if (this.opened) {
+        this._showIziToast();
+      } else {
+        this.open();        
       }
-
-      var iziToastPosition = this.verticalAlign + capfirst(this.horizontalAlign);
-      iziToast.show({
-        message: this.text,
-        position: iziToastPosition,
-        close: false,
-        progressBar: false,
-        timeout: this.duration        
-      });
-
-      this.open();
     },
 
     /**
@@ -200,7 +216,7 @@
      */
     hide: function() {
       iziToast.destroy();
-      
+
       this.close();
     },
 
@@ -236,6 +252,8 @@
           currentToast.close();
         }
 
+        this._showIziToast();
+
         currentToast = this;
         this.fire('iron-announce', {
           text: this.text
@@ -245,8 +263,22 @@
         }
       } else if (currentToast === this) {
         currentToast = null;
+        iziToast.destroy();
       }
+
       Polymer.IronOverlayBehaviorImpl._openedChanged.apply(this, arguments);
+    },
+
+    _showIziToast: function() {
+      var iziToastPosition = this.toastPosition;
+      iziToast.show({
+        message: this.text,
+        position: iziToastPosition,
+        close: false,
+        progressBar: true,
+        timeout: this.duration,
+        transitionIn: this.showAnimation
+      });
     },
 
     /**

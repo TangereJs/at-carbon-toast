@@ -3,7 +3,7 @@
 
 <dom-module id="izi-toast-template">
   <style>
-   .iziToast {    
+   .iziToast {
     background-color: var(--paper-toast-background-color, #323232);
     color: var(--paper-toast-color, #f1f1f1);
     min-height: 48px;
@@ -17,6 +17,14 @@
     @apply(--paper-font-common-base);
   }
 
+  @media (max-width: 568px) {
+    .iziToast {
+      margin: 5px 0;
+      border-radius: 3px;
+      width: auto;
+    }  
+  }
+
   #buttonClose {
     display: none;
   }
@@ -24,7 +32,8 @@
   <template>
     <div id="toastCapsule">
       <div id="toast">
-        <div id="toastBody"><strong id="strong"></strong>
+        <div id="toastBody">
+          <strong id="strong"></strong>
           <p id="p"></p>
         </div>
         <button id="buttonClose"><i id="icon"></i></button>
