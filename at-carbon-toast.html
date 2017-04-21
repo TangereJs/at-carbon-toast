@@ -121,6 +121,18 @@
       },
 
       /**
+       * now:icon to be displyed to the left of message text
+       * 
+       * @property icon
+       * @type String
+       * @default "" 
+       */
+      icon: {
+        type: String,
+        value: ""
+      },
+
+      /**
        * The duration in milliseconds to show the toast.
        * Set to `0`, a negative number, or `Infinity`, to disable the
        * toast auto-closing.
@@ -215,7 +227,7 @@
      * Hide the toast. Same as `close()` from `IronOverlayBehavior`.
      */
     hide: function() {
-      iziToast.destroy();
+      this._hideIziToast();
 
       this.close();
     },
@@ -263,7 +275,7 @@
         }
       } else if (currentToast === this) {
         currentToast = null;
-        iziToast.destroy();
+        this._hideIziToast();
       }
 
       Polymer.IronOverlayBehaviorImpl._openedChanged.apply(this, arguments);
@@ -272,12 +284,21 @@
     _showIziToast: function() {
       var iziToastPosition = this.toastPosition;
       iziToast.show({
+        class: 'toast-query-handle',
+        toastIcon: this.icon,
         message: this.text,
         position: iziToastPosition,
         close: false,
         progressBar: true,
         timeout: this.duration,
         transitionIn: this.showAnimation
+      });
+    },
+
+    _hideIziToast: function() {
+      var toasts = document.querySelectorAll('.toast-query-handle');
+      toasts.forEach(function(toast, index) { 
+        iziToast.hide({}, toast);
       });
     },
 

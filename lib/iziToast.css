@@ -21,7 +21,7 @@
   padding: 8px 50px 9px 0;
   background: rgba(238,238,238,0.9);
   border-color: rgba(238,238,238,0.9);
-  min-height: 54px;
+  /*min-height: 54px;*/
   width: 100%;
   pointer-events: all;
   cursor: default;
@@ -101,7 +101,7 @@
   position: relative;
   /*padding: 0 0 0 10px;*/
   height: 100%;
-  min-height: 36px;
+  min-height: 48px;
   /*margin: 0 0 0 16px;*/
 }
 .iziToast > .iziToast-body::after {
@@ -177,9 +177,9 @@
 .iziToast > .iziToast-body > p {
   /*color: rgba(0,0,0,0.6);*/
   padding: 0;
-  margin: 10px 0;
+  margin: 0;
   font-size: 14px;
-  line-height: 16px;
+  line-height: 48px;
   text-align: left;
   float: left;
 }

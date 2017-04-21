@@ -1,5 +1,5 @@
 <link rel="import" href="../tangere/tangere.html" />
-
+<link rel="import" href="../at-carbon-icon-color/at-carbon-icon-color.html" />
 
 <dom-module id="izi-toast-template">
   <style>
@@ -24,6 +24,15 @@
       width: auto;
     }  
   }
+ 
+  .toast-icon {
+    display: inline-block;
+    box-sizing: border-box;
+    width: 48px;
+    height: 48px;
+    padding: 8px;
+    float: left;
+  }
 
   #buttonClose {
     display: none;
@@ -33,6 +42,7 @@
     <div id="toastCapsule">
       <div id="toast">
         <div id="toastBody">
+          <at-carbon-icon-color id="toastIcon" class="toast-icon"></at-carbon-icon-color>        
           <strong id="strong"></strong>
           <p id="p"></p>
         </div>
