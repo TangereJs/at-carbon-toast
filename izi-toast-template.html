@@ -1,4 +1,5 @@
 <link rel="import" href="../tangere/tangere.html" />
+<link rel="import" href="../at-theme/at-theme.html" />
 <link rel="import" href="../at-carbon-icon-color/at-carbon-icon-color.html" />
 
 <dom-module id="izi-toast-template">
@@ -36,6 +37,13 @@
 
   #buttonClose {
     display: none;
+  }
+
+  .iziToast > .iziToast-progressbar {
+    background: var(--primary-color, rgba(255,255,255,0.2));
+  }
+  .iziToast > .iziToast-progressbar > div {  
+    background: rgba(0,0,0,0.3);
   }
   </style>
   <template>
