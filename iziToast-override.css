@@ -1,0 +1,9 @@
+/* we have this override file because */
+/* 1. we want to copy/paste updated original lib when update comes out */
+/* 2. there is no way to style wrapper from inside at-carbon-toast or izi-toast-template */
+@media only screen and (min-width: 568px) {
+  .iziToast-wrapper {
+     /* *ij* we do not want padding because we want to match paper-toast style */
+    padding: 0;
+  }
+}
