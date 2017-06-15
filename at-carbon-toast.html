@@ -283,16 +283,22 @@
     },
 
     _showIziToast: function() {
+      var self = this;
       var iziToastPosition = this.toastPosition;
       iziToast.show({
         class: 'toast-query-handle',
+        horizontalOffset: this.horizontalOffset,
+        verticalOffset: this.verticalOffset,
         toastIcon: this.icon,
         message: this.text,
         position: iziToastPosition,
         close: false,
         progressBar: true,
         timeout: this.duration,
-        transitionIn: this.showAnimation
+        transitionIn: this.showAnimation,
+        onClose: function(event) {
+          self.opened = false;
+        }
       });
     },
 
