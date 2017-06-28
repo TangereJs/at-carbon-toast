@@ -1,6 +1,4 @@
 <link rel="import" href="../tangere/tangere.html" />
-<link rel="import" href="../iron-a11y-announcer/iron-a11y-announcer.html">
-<link rel="import" href="../iron-overlay-behavior/iron-overlay-behavior.html">
 <link rel="import" href="izi-toast-template.html" />
 
 <script src="lib/iziToast.js"></script>
@@ -8,36 +6,27 @@
 <link rel="stylesheet" type="text/css" href="iziToast-override.css">
 
 <dom-module id="at-carbon-toast">
-  <style>
-   :host {
-    display: none;
-  }
-  </style>
   <template>
+    <style>
+     :host {
+      display: none;
+    }
+    </style>
   </template>
 </dom-module>
 <script>
 (function() {
 
-  // Keeps track of the toast currently opened.
-  var currentToast = null;
-
   Polymer({
     is: "at-carbon-toast",
 
-    behaviors: [
-      Polymer.IronOverlayBehavior
-    ],
-
     properties: {
-      /**
-       * The element to fit `this` into.
-       * Overridden from `Polymer.IronFitBehavior`.
-       */
-      fitInto: {
-        type: Object,
-        value: window,
-        observer: '_onFitIntoChanged'
+      
+      opened: {
+        observer: '_openedChanged',
+        type: Boolean,
+        value: false,
+        notify: true
       },
 
       /**
@@ -152,134 +141,63 @@
       },
 
       /**
-       * Overridden from `IronOverlayBehavior`.
-       * Set to false to enable closing of the toast by clicking outside it.
+       * A pixel value that will be added to the position calculated for the
+       * given `horizontalAlign`, in the direction of alignment. You can think
+       * of it as increasing or decreasing the distance to the side of the
+       * screen given by `horizontalAlign`.
+       *
+       * If `horizontalAlign` is "left", this offset will increase or decrease
+       * the distance to the left side of the screen: a negative offset will
+       * move the dropdown to the left; a positive one, to the right.
+       *
+       * Conversely if `horizontalAlign` is "right", this offset will increase
+       * or decrease the distance to the right side of the screen: a negative
+       * offset will move the dropdown to the right; a positive one, to the left.
        */
-      noCancelOnOutsideClick: {
-        type: Boolean,
-        value: true
+      horizontalOffset: {
+        type: Number,
+        value: 0,
+        notify: true
       },
 
       /**
-       * Overridden from `IronOverlayBehavior`.
-       * Set to true to disable auto-focusing the toast or child nodes with
-       * the `autofocus` attribute` when the overlay is opened.
+       * A pixel value that will be added to the position calculated for the
+       * given `verticalAlign`, in the direction of alignment. You can think
+       * of it as increasing or decreasing the distance to the side of the
+       * screen given by `verticalAlign`.
+       *
+       * If `verticalAlign` is "top", this offset will increase or decrease
+       * the distance to the top side of the screen: a negative offset will
+       * move the dropdown upwards; a positive one, downwards.
+       *
+       * Conversely if `verticalAlign` is "bottom", this offset will increase
+       * or decrease the distance to the bottom side of the screen: a negative
+       * offset will move the dropdown downwards; a positive one, upwards.
        */
-      noAutoFocus: {
-        type: Boolean,
-        value: true
+      verticalOffset: {
+        type: Number,
+        value: 0,
+        notify: true
       }
     },
 
-    listeners: {
-      'transitionend': '__onTransitionEnd'
-    },
-
-    /**
-     * Read-only. Deprecated. Use `opened` from `IronOverlayBehavior`.
-     * @property visible
-     * @deprecated
-     */
-    get visible() {
-      Polymer.Base._warn('`visible` is deprecated, use `opened` instead');
-      return this.opened;
-    },
-
-    /**
-     * Read-only. Can auto-close if duration is a positive finite number.
-     * @property _canAutoClose
-     */
-    get _canAutoClose() {
-      return this.duration > 0 && this.duration !== Infinity;
-    },
-
-    created: function() {
-      this._autoClose = null;
-      Polymer.IronA11yAnnouncer.requestAvailability();
-    },
-
-    /**
-     * Show the toast. Without arguments, this is the same as `open()` from `IronOverlayBehavior`.
-     * @param {(Object|string)=} properties Properties to be set before opening the toast.
-     * e.g. `toast.show('hello')` or `toast.show({text: 'hello', duration: 3000})`
-     */
-    show: function(properties) {
-      if (typeof properties == 'string') {
-        properties = { text: properties };
-      }
-      for (var property in properties) {
-        if (property.indexOf('_') === 0) {
-          Polymer.Base._warn('The property "' + property + '" is private and was not set.');
-        } else if (property in this) {
-          this[property] = properties[property];
-        } else {
-          Polymer.Base._warn('The property "' + property + '" is not valid.');
-        }
-      }
-
+    show: function() {
       if (this.opened) {
+        // if opened is already true when show is called we want to display new toasts
+        // this provides for toast stacking
         this._showIziToast();
-      } else {
-        this.open();        
+        return;
       }
-    },
 
-    /**
-     * Hide the toast. Same as `close()` from `IronOverlayBehavior`.
-     */
+      this.opened = true;
+    },
+  
     hide: function() {
-      this._hideIziToast();
-
-      this.close();
+      this.opened = false;
     },
 
-    /**
-     * Called on transitions of the toast, indicating a finished animation
-     * @private
-     */
-    __onTransitionEnd: function(e) {
-      // there are different transitions that are happening when opening and
-      // closing the toast. The last one so far is for `opacity`.
-      // This marks the end of the transition, so we check for this to determine if this
-      // is the correct event.
-      if (e && e.target === this && e.propertyName === 'opacity') {
-        if (this.opened) {
-          this._finishRenderOpened();
-        } else {
-          this._finishRenderClosed();
-        }
-      }
-    },
-
-    /**
-     * Overridden from `IronOverlayBehavior`.
-     * Called when the value of `opened` changes.
-     */
-    _openedChanged: function() {
-      if (this._autoClose !== null) {
-        this.cancelAsync(this._autoClose);
-        this._autoClose = null;
-      }
-      if (this.opened) {
-        if (currentToast && currentToast !== this) {
-          currentToast.close();
-        }
-
-        this._showIziToast();
-
-        currentToast = this;
-        this.fire('iron-announce', {
-          text: this.text
-        });
-        if (this._canAutoClose) {
-          this._autoClose = this.async(this.close, this.duration);
-        }
-      } else if (currentToast === this) {
-        currentToast = null;
-        this._hideIziToast();
-      }
-
-      Polymer.IronOverlayBehaviorImpl._openedChanged.apply(this, arguments);
+    _openedChanged: function(newValue, oldValue) {
+      var result = newValue ? this._showIziToast() : this._hideIziToast();
     },
 
     _showIziToast: function() {
@@ -307,28 +225,8 @@
       toasts.forEach(function(toast, index) { 
         iziToast.hide({}, toast);
       });
-    },
-
-    /**
-     * Overridden from `IronOverlayBehavior`.
-     */
-    _renderOpened: function() {
-      this.classList.add('paper-toast-open');
-    },
-
-    /**
-     * Overridden from `IronOverlayBehavior`.
-     */
-    _renderClosed: function() {
-      this.classList.remove('paper-toast-open');
-    },
-
-    /**
-     * @private
-     */
-    _onFitIntoChanged: function(fitInto) {
-      this.positionTarget = fitInto;
     }
+
   });
 
 })();
