@@ -8,226 +8,226 @@
 <dom-module id="at-carbon-toast">
   <template>
     <style>
-     :host {
-      display: none;
-    }
+       :host {
+        display: none;
+      }
     </style>
   </template>
 </dom-module>
 <script>
-(function() {
+  (function() {
 
-  Polymer({
-    is: "at-carbon-toast",
+    Polymer({
+      is: "at-carbon-toast",
 
-    properties: {
-      
-      opened: {
-        observer: '_openedChanged',
-        type: Boolean,
-        value: false,
-        notify: true
-      },
+      properties: {
 
-      /**
-       * Toast position on the screen.
-       * Possible values are bottomRight, bottomLeft, bottomCenter, topRight, topLeft, topCenter and center
-       *
-       * @property toastPosition
-       * @type String
-       * @default bottomLeft 
-       */
-       // position is renamed to toast position because ironfitbehavior has position function and that function takes over if toastPosition is named position
-      toastPosition: {
-        type: String,
-        value: 'bottomLeft',
-        xtype: 'enum',
-        xvaluelist:[{
-          title: "Bottom left",
-          value: "bottomLeft"
-        }, {
-          title: "Bottom right",
-          value: "bottomRight"
-        }, {
-          title: "Bottom center",
-          value: "bottomCenter"
-        }, {
-          title: "Top left",
-          value: "topLeft"
-        }, {
-          title: "Top right",
-          value: "topRight"
-        }, {
-          title: "Top center",
-          value: "topCenter"
-        }, {
-          title: "Center",
-          value: "center"
-        }]
-      },
+        opened: {
+          observer: '_openedChanged',
+          type: Boolean,
+          value: false,
+          notify: true
+        },
 
-      /**
-       * animation used when toast is shown
-       * 
-       * @property showAnimation
-       * @type string
-       * @default fadeInUp
-       */
-      showAnimation: {
-        type: String,
-        value: "fadeInUp",
-        xtype: 'enum',
-        xvaluelist: [{
-          title: "bounceInLeft",
-          value: "bounceInLeft"
-        }, {
-          title: "bounceInRight",
-          value: "bounceInRight"
-        }, {
-          title: "bounceInUp",
-          value: "bounceInUp"
-        }, {
-          title: "bounceInDown",
-          value: "bounceInDown"
-        }, {
-          title: "fadeIn",
-          value: "fadeIn"
-        }, {
-          title: "fadeInDown",
-          value: "fadeInDown"
-        }, {
-          title: "fadeInUp",
-          value: "fadeInUp"
-        }, {
-          title: "fadeInLeft",
-          value: "fadeInLeft"
-        }, {
-          title: "fadeInRight",
-          value: "fadeInRight"
-        }, {
-          title: "flipInX",
-          value: "flipInX"
-        }]
-      },
+        /**
+         * Toast position on the screen.
+         * Possible values are bottomRight, bottomLeft, bottomCenter, topRight, topLeft, topCenter and center
+         *
+         * @property toastPosition
+         * @type String
+         * @default bottomLeft 
+         */
+        // position is renamed to toast position because ironfitbehavior has position function and that function takes over if toastPosition is named position
+        toastPosition: {
+          type: String,
+          value: 'bottomLeft',
+          xtype: 'enum',
+          xvaluelist: [{
+            title: "Bottom left",
+            value: "bottomLeft"
+          }, {
+            title: "Bottom right",
+            value: "bottomRight"
+          }, {
+            title: "Bottom center",
+            value: "bottomCenter"
+          }, {
+            title: "Top left",
+            value: "topLeft"
+          }, {
+            title: "Top right",
+            value: "topRight"
+          }, {
+            title: "Top center",
+            value: "topCenter"
+          }, {
+            title: "Center",
+            value: "center"
+          }]
+        },
 
-      /**
-       * now:icon to be displyed to the left of message text
-       * 
-       * @property icon
-       * @type String
-       * @default "" 
-       */
-      icon: {
-        type: String,
-        value: ""
-      },
+        /**
+         * animation used when toast is shown
+         * 
+         * @property showAnimation
+         * @type string
+         * @default fadeInUp
+         */
+        showAnimation: {
+          type: String,
+          value: "fadeInUp",
+          xtype: 'enum',
+          xvaluelist: [{
+            title: "bounceInLeft",
+            value: "bounceInLeft"
+          }, {
+            title: "bounceInRight",
+            value: "bounceInRight"
+          }, {
+            title: "bounceInUp",
+            value: "bounceInUp"
+          }, {
+            title: "bounceInDown",
+            value: "bounceInDown"
+          }, {
+            title: "fadeIn",
+            value: "fadeIn"
+          }, {
+            title: "fadeInDown",
+            value: "fadeInDown"
+          }, {
+            title: "fadeInUp",
+            value: "fadeInUp"
+          }, {
+            title: "fadeInLeft",
+            value: "fadeInLeft"
+          }, {
+            title: "fadeInRight",
+            value: "fadeInRight"
+          }, {
+            title: "flipInX",
+            value: "flipInX"
+          }]
+        },
 
-      /**
-       * The duration in milliseconds to show the toast.
-       * Set to `0`, a negative number, or `Infinity`, to disable the
-       * toast auto-closing.
-       */
-      duration: {
-        type: Number,
-        value: 3000
-      },
+        /**
+         * now:icon to be displyed to the left of message text
+         * 
+         * @property icon
+         * @type String
+         * @default "" 
+         */
+        icon: {
+          type: String,
+          value: ""
+        },
 
-      /**
-       * The text to display in the toast.
-       */
-      text: {
-        type: String,
-        value: ''
-      },
+        /**
+         * The duration in milliseconds to show the toast.
+         * Set to `0`, a negative number, or `Infinity`, to disable the
+         * toast auto-closing.
+         */
+        duration: {
+          type: Number,
+          value: 3000
+        },
 
-      /**
-       * A pixel value that will be added to the position calculated for the
-       * given `horizontalAlign`, in the direction of alignment. You can think
-       * of it as increasing or decreasing the distance to the side of the
-       * screen given by `horizontalAlign`.
-       *
-       * If `horizontalAlign` is "left", this offset will increase or decrease
-       * the distance to the left side of the screen: a negative offset will
-       * move the dropdown to the left; a positive one, to the right.
-       *
-       * Conversely if `horizontalAlign` is "right", this offset will increase
-       * or decrease the distance to the right side of the screen: a negative
-       * offset will move the dropdown to the right; a positive one, to the left.
-       */
-      horizontalOffset: {
-        type: Number,
-        value: 0,
-        notify: true
-      },
+        /**
+         * The text to display in the toast.
+         */
+        text: {
+          type: String,
+          value: ''
+        },
 
-      /**
-       * A pixel value that will be added to the position calculated for the
-       * given `verticalAlign`, in the direction of alignment. You can think
-       * of it as increasing or decreasing the distance to the side of the
-       * screen given by `verticalAlign`.
-       *
-       * If `verticalAlign` is "top", this offset will increase or decrease
-       * the distance to the top side of the screen: a negative offset will
-       * move the dropdown upwards; a positive one, downwards.
-       *
-       * Conversely if `verticalAlign` is "bottom", this offset will increase
-       * or decrease the distance to the bottom side of the screen: a negative
-       * offset will move the dropdown downwards; a positive one, upwards.
-       */
-      verticalOffset: {
-        type: Number,
-        value: 0,
-        notify: true
-      }
-    },
+        /**
+         * A pixel value that will be added to the position calculated for the
+         * given `horizontalAlign`, in the direction of alignment. You can think
+         * of it as increasing or decreasing the distance to the side of the
+         * screen given by `horizontalAlign`.
+         *
+         * If `horizontalAlign` is "left", this offset will increase or decrease
+         * the distance to the left side of the screen: a negative offset will
+         * move the dropdown to the left; a positive one, to the right.
+         *
+         * Conversely if `horizontalAlign` is "right", this offset will increase
+         * or decrease the distance to the right side of the screen: a negative
+         * offset will move the dropdown to the right; a positive one, to the left.
+         */
+        horizontalOffset: {
+          type: Number,
+          value: 0,
+          notify: true
+        },
 
-    show: function() {
-      if (this.opened) {
-        // if opened is already true when show is called we want to display new toasts
-        // this provides for toast stacking
-        this._showIziToast();
-        return;
-      }
-
-      this.opened = true;
-    },
-  
-    hide: function() {
-      this.opened = false;
-    },
-
-    _openedChanged: function(newValue, oldValue) {
-      var result = newValue ? this._showIziToast() : this._hideIziToast();
-    },
-
-    _showIziToast: function() {
-      var self = this;
-      var iziToastPosition = this.toastPosition;
-      iziToast.show({
-        class: 'toast-query-handle',
-        horizontalOffset: this.horizontalOffset,
-        verticalOffset: this.verticalOffset,
-        toastIcon: this.icon,
-        message: this.text,
-        position: iziToastPosition,
-        close: false,
-        progressBar: true,
-        timeout: this.duration,
-        transitionIn: this.showAnimation,
-        onClose: function(event) {
-          self.opened = false;
+        /**
+         * A pixel value that will be added to the position calculated for the
+         * given `verticalAlign`, in the direction of alignment. You can think
+         * of it as increasing or decreasing the distance to the side of the
+         * screen given by `verticalAlign`.
+         *
+         * If `verticalAlign` is "top", this offset will increase or decrease
+         * the distance to the top side of the screen: a negative offset will
+         * move the dropdown upwards; a positive one, downwards.
+         *
+         * Conversely if `verticalAlign` is "bottom", this offset will increase
+         * or decrease the distance to the bottom side of the screen: a negative
+         * offset will move the dropdown downwards; a positive one, upwards.
+         */
+        verticalOffset: {
+          type: Number,
+          value: 0,
+          notify: true
         }
-      });
-    },
+      },
 
-    _hideIziToast: function() {
-      var toasts = document.querySelectorAll('.toast-query-handle');
-      toasts.forEach(function(toast, index) { 
-        iziToast.hide({}, toast);
-      });
-    }
+      show: function() {
+        if (this.opened) {
+          // if opened is already true when show is called we want to display new toasts
+          // this provides for toast stacking
+          this._showIziToast();
+          return;
+        }
 
-  });
+        this.opened = true;
+      },
 
-})();
+      hide: function() {
+        this.opened = false;
+      },
+
+      _openedChanged: function(newValue, oldValue) {
+        var result = newValue ? this._showIziToast() : this._hideIziToast();
+      },
+
+      _showIziToast: function() {
+        var self = this;
+        var iziToastPosition = this.toastPosition;
+        iziToast.show({
+          class: 'toast-query-handle',
+          horizontalOffset: this.horizontalOffset,
+          verticalOffset: this.verticalOffset,
+          toastIcon: this.icon,
+          message: this.text,
+          position: iziToastPosition,
+          close: false,
+          progressBar: true,
+          timeout: this.duration,
+          transitionIn: this.showAnimation,
+          onClose: function(event) {
+            self.opened = false;
+          }
+        });
+      },
+
+      _hideIziToast: function() {
+        var toasts = document.querySelectorAll('.toast-query-handle');
+        toasts.forEach(function(toast, index) {
+          iziToast.hide({}, toast);
+        });
+      }
+
+    });
+
+  })();
 </script>
