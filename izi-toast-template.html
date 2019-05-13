@@ -5,24 +5,24 @@
 <dom-module id="izi-toast-template">
   <style>
    .iziToast {
-    background-color: var(--paper-toast-background-color, #323232);
-    color: var(--paper-toast-color, #f1f1f1);
-    min-height: 48px;
-    min-width: 0;
-    padding: 16px 24px;
-    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
-    border-radius: 2px;
-    margin: 12px;
-    font-size: 14px;
-    cursor: default;
-    @apply(--paper-font-common-base);
+    background-color: var(--paper-toast-background-color, #323232) !important;
+    color: var(--paper-toast-color, #f1f1f1) !important;
+    min-height: 48px !important;
+    min-width: 0 !important;
+    padding: 16px 24px !important;
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26) !important;
+    border-radius: 2px !important;
+    margin: 12px !important;
+    font-size: 14px !important;
+    cursor: default !important;
+    @apply(--paper-font-common-base) !important;
   }
 
   @media (max-width: 568px) {
     .iziToast {
-      margin: 5px 0;
-      border-radius: 3px;
-      width: 100%;
+      margin: 5px 0 !important;
+      border-radius: 3px !important;
+      width: 100% !important;
     }
   }
 
@@ -41,10 +41,10 @@
   }
 
   .iziToast > .iziToast-progressbar {
-    background: var(--primary-color, rgba(255,255,255,0.2));
+    background: var(--primary-color, rgba(255,255,255,0.2)) !important;
   }
   .iziToast > .iziToast-progressbar > div {
-    background: rgba(0,0,0,0.3);
+    background: rgba(0,0,0,0.3) !important;
   }
   </style>
   <template>
