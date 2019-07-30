@@ -222,7 +222,8 @@
 
       _hideIziToast: function() {
         var toasts = document.querySelectorAll('.toast-query-handle');
-        toasts.forEach(function(toast, index) {
+
+        Array.prototype.forEach.call(toasts, function (toast) {
           iziToast.hide({}, toast);
         });
       }
