@@ -1,15 +1,81 @@
 <link rel="import" href="../tangere/tangere.html" />
-<link rel="import" href="izi-toast-template.html" />
+<link rel="import" href="../at-carbon-icon/at-carbon-icon.html" />
+<link rel="import" href="../at-carbon-icon-button/at-carbon-icon-button.html" />
+<link rel="import" href="../paper-toast/paper-toast.html" />
+<link rel="import" href="../paper-button/paper-button.html" />
+<link rel="import" href="../paper-styles/paper-styles.html"/>
+<link rel="import" href="../iron-flex-layout/iron-flex-layout.html"/>
+<link rel="import" href="../iron-swipeable-container/iron-swipeable-container.html" />
 
-<script src="lib/iziToast.js"></script>
+
+
+
 
 <dom-module id="at-carbon-toast">
-  <template>
+  <template strip-whitespace>
     <style>
-       :host {
-        display: none;
+      :host:not([disable-swipe]) iron-swipeable-container {
+        -moz-user-select: none;
+        -ms-user-select: none;
+        -webkit-user-select: none;
+        user-select: none;
+        cursor: default;
+      }
+
+      paper-toast {
+        @apply --paper-font-body2;
+        @apply --layout-horizontal;
+        @apply --layout-center;
+        color: var(--paper-toast-color, #f1f1f1);
+        background-color: var(--paper-toast-background-color, #323232);
+        @apply --app-toast;
+      }
+
+      .content-container {
+        @apply --layout-flex;
+        @apply --layout-vertical;
+      }
+
+      paper-button {
+        color: var(--accent-color);
+        @apply --app-toast-button;
+      }
+
+      #mainIcon {
+        margin-right: 4px;
+        @apply --app-toast-main-icon;
+        --iron-icon-stroke-color: var(--app-toast-main-icon-stroke-color);
+      }
+
+      #cancelIcon {
+        --iron-icon-height: 14px;
+        --iron-icon-width: 14px;
+        margin-left: 2px;
+        padding: 2px;
+        @apply --app-toast-cancel-icon;
       }
     </style>
+
+    <div id="container">
+      <iron-swipeable-container id="swiper" disabled="[[disableSwipe]]" on-iron-swipe="__onSwiped"> </iron-swipeable-container>
+
+      <paper-toast id="toast" duration="[[duration]]" on-tap="__onTap" on-iron-overlay-closed="__onClosed">
+        <at-carbon-icon id="mainIcon" icon="[[icon]]" hidden$="[[_hideIcon(icon, src)]]"></at-carbon-icon>
+
+        <div class="content-container">
+          <slot></slot>
+          <span>[[text]]</span>
+        </div>
+
+        <paper-button id="actionButton" on-tap="_onAction" hidden$="[[!actionText]]">[[actionText]]</paper-button>
+        <paper-button id="action2Button" on-tap="_onAction2" hidden$="[[!action2Text]]">[[action2Text]]</paper-button>
+        <at-carbon-icon-button id="cancelIcon" icon="now:close" on-tap="_cancelTapped" hidden$="[[!showCancel]]" color="green"></at-carbon-icon-button>
+
+      </paper-toast>
+
+    </div>
+
+
   </template>
 </dom-module>
 <script>
@@ -21,10 +87,10 @@
       properties: {
 
         opened: {
-          observer: '_openedChanged',
           type: Boolean,
           value: false,
-          notify: true
+          notify: true,
+          observer: '_openedChanged'
         },
 
         /**
@@ -176,57 +242,184 @@
           type: Number,
           value: 0,
           notify: true
+        },
+
+        src: {
+          type: String,
+          value: ''
+        },
+
+        iconset: {
+          type: String,
+          value: 'toast-icons'
+        },
+
+        actionText: {
+          type: String,
+          value: ''
+        },
+
+        action2Text: {
+          type: String,
+          value: ''
+        },
+
+        onAction: {
+          type: Object,
+          value: null
+        },
+
+        onAction2: {
+          type: Object,
+          value: null
+        },
+
+        onCancel: {
+          type: Object,
+          value: null
+        },
+
+        onTapped: {
+          type: Object,
+          value: null
+        },
+
+        showCancel: {
+          type: Boolean,
+          value: false
+        },
+
+        fitBottom: {
+          type: Boolean,
+          value: false,
+          observer: '_fitBottomChanged'
+        },
+
+        disableSwipe: {
+          type: Boolean,
+          value: false,
+          reflectToAttribute: true
         }
+
       },
 
-      show: function() {
-        if (this.opened) {
-          // if opened is already true when show is called we want to display new toasts
-          // this provides for toast stacking
-          this._showIziToast();
-          return;
-        }
+      attached: function () {
+        this._defaultProperties = {
+          icon: this.icon,
+          iconset: this.iconset,
+          text: this.text,
+          duration: this.duration,
+          actionText: this.actionText,
+          action2Text: this.action2Text,
+          onAction: this.onAction,
+          onAction2: this.onAction2,
+          onCancel: this.onCancel,
+          onTapped: this.onTapped,
+          showCancel: this.showCancel,
+          fitBottom: this.fitBottom,
+          disableSwipe: this.disableSwipe,
+        };
+      },
 
-        this.opened = true;
+      reset: function () {
+        this._setProperties(this._defaultProperties);
+      },
+
+      show: function(properties) {
+        this._setProperties(properties);
+        this.$.toast.style.opacity = 1;
+        Polymer.dom(this.$.swiper).appendChild(this.$.toast);
+        this.$.toast.show(properties);
+      },
+
+      open: function () { this.show(); },
+
+      close: function () {
+        this.$.toast.close();
       },
 
       hide: function() {
-        this.opened = false;
+        this.$.toast.close();
+      },
+
+      _cancelTapped: function (e) {
+        e.stopPropagation();
+        this._cancel(e);
+      },
+
+      _cancel: function (e) {
+        this.$.toast.close();
+        this.onCancel && this.onCancel(e);
+        this.fire('toast-cancel');
+      },
+
+
+      _onAction: function (e) {
+        e.stopPropagation();
+        this.onAction && this.onAction(e);
+        this.fire('toast-action');
+      },
+
+      _onAction2: function (e) {
+        e.stopPropagation();
+        this.onAction2 && this.onAction2(e);
+        this.fire('toast-action2');
+      },
+
+      _fitBottomChanged: function (fitBottom) {
+        if (fitBottom) {
+          this.$.toast.classList.add('fit-bottom');
+        } else {
+          this.$.toast.classList.remove('fit-bottom');
+        }
+      },
+
+      _setProperties: function (properties) {
+        if (properties) {
+          for (var property in properties) {
+            if (property in this && property.indexOf('_') != 0) {
+              this[property] = properties[property];
+              delete properties[property];
+            }
+          }
+        }
+      },
+
+      _getIcon: function (iconset, icon) {
+        return (iconset && icon) ? iconset + ':' + icon : '';
+      },
+
+      _hideIcon: function (icon, src) {
+        return !(icon || src);
+      },
+
+      __onSwiped: function (e, data) {
+        this.$.toast.style.opacity = 0;
+        this._wasSwiped = true;
+        this.close();
+      },
+
+      __onClosed: function (e, data) {
+        if (this._wasSwiped) {
+          this._cancel(e);
+          this._wasSwiped = false;
+        }
+        this.$.toast.style.transform = 'translate3d(0, 0, 0) rotate(0)';
+      },
+
+      __onTap: function (e) {
+        this.onTapped && this.onTapped(e);
+        this.fire('toast-tap');
       },
 
       _openedChanged: function(newValue, oldValue) {
-        var result = newValue ? this._showIziToast() : this._hideIziToast();
-      },
-
-      _showIziToast: function() {
-        var self = this;
-        var iziToastPosition = this.toastPosition;
-        iziToast.show({
-          class: 'toast-query-handle',
-          horizontalOffset: this.horizontalOffset,
-          verticalOffset: this.verticalOffset,
-          toastIcon: this.icon,
-          message: this.text,
-          position: iziToastPosition,
-          close: false,
-          progressBar: true,
-          timeout: this.duration,
-          transitionIn: this.showAnimation,
-          onClose: function(event) {
-            self.opened = false;
-          }
-        });
-      },
-
-      _hideIziToast: function() {
-        var toasts = document.querySelectorAll('.toast-query-handle');
-
-        Array.prototype.forEach.call(toasts, function (toast) {
-          iziToast.hide({}, toast);
-        });
+        if(newValue == true) {
+          this.open();
+        } else {
+          this.close();
+        }
       }
 
     });
-
   })();
 </script>
