@@ -1,15 +1,11 @@
 <link rel="import" href="../tangere/tangere.html" />
 <link rel="import" href="../at-carbon-icon/at-carbon-icon.html" />
-<link rel="import" href="../at-carbon-icon-button/at-carbon-icon-button.html" />
+<link rel="import" href="../at-core-signals/at-core-signals.html"/>
 <link rel="import" href="../paper-toast/paper-toast.html" />
 <link rel="import" href="../paper-button/paper-button.html" />
 <link rel="import" href="../paper-styles/paper-styles.html"/>
 <link rel="import" href="../iron-flex-layout/iron-flex-layout.html"/>
 <link rel="import" href="../iron-swipeable-container/iron-swipeable-container.html" />
-
-
-
-
 
 <dom-module id="at-carbon-toast">
   <template strip-whitespace>
@@ -46,21 +42,15 @@
         @apply --app-toast-main-icon;
         --iron-icon-stroke-color: var(--app-toast-main-icon-stroke-color);
       }
+  </style>
 
-      #cancelIcon {
-        --iron-icon-height: 14px;
-        --iron-icon-width: 14px;
-        margin-left: 2px;
-        padding: 2px;
-        @apply --app-toast-cancel-icon;
-      }
-    </style>
+    <at-core-signals id="coreSignals" on-sys-error="_handleSysError" on-sys-info="_handleSysInfo"></at-core-signals>
 
     <div id="container">
-      <iron-swipeable-container id="swiper" disabled="[[disableSwipe]]" on-iron-swipe="__onSwiped"> </iron-swipeable-container>
+      <iron-swipeable-container id="swiper" on-iron-swipe="__onSwiped"> </iron-swipeable-container>
 
-      <paper-toast id="toast" duration="[[duration]]" on-tap="__onTap" on-iron-overlay-closed="__onClosed">
-        <at-carbon-icon id="mainIcon" icon="[[icon]]" hidden$="[[_hideIcon(icon, src)]]"></at-carbon-icon>
+      <paper-toast id="toast" duration="[[duration]]" on-iron-overlay-closed="__onClosed">
+        <at-carbon-icon id="mainIcon" icon="[[icon]]" hidden$="[[_hideIcon(icon)]]"></at-carbon-icon>
 
         <div class="content-container">
           <slot></slot>
@@ -69,12 +59,8 @@
 
         <paper-button id="actionButton" on-tap="_onAction" hidden$="[[!actionText]]">[[actionText]]</paper-button>
         <paper-button id="action2Button" on-tap="_onAction2" hidden$="[[!action2Text]]">[[action2Text]]</paper-button>
-        <at-carbon-icon-button id="cancelIcon" icon="now:close" on-tap="_cancelTapped" hidden$="[[!showCancel]]" color="green"></at-carbon-icon-button>
-
       </paper-toast>
-
     </div>
-
 
   </template>
 </dom-module>
@@ -244,80 +230,54 @@
           notify: true
         },
 
-        src: {
-          type: String,
-          value: ''
-        },
-
-        iconset: {
-          type: String,
-          value: 'toast-icons'
-        },
-
         actionText: {
+            type: String,
+            value: ''
+          },
+
+          action2Text: {
+            type: String,
+            value: ''
+          },
+
+          onAction: {
+            type: Object,
+            value: null
+          },
+
+          onAction2: {
+            type: Object,
+            value: null
+          },
+
+        renderMode: {
           type: String,
-          value: ''
+          value: '0',
+          observer: '_renderModeChanged',
+          xtype: "enum",
+          xvaluelist: [{
+            title: "auto",
+            value: "0"
+          }, {
+            title: "desktop",
+            value: "1"
+          }, {
+            title: "mobile",
+            value: "2"
+          }],
         },
-
-        action2Text: {
-          type: String,
-          value: ''
-        },
-
-        onAction: {
-          type: Object,
-          value: null
-        },
-
-        onAction2: {
-          type: Object,
-          value: null
-        },
-
-        onCancel: {
-          type: Object,
-          value: null
-        },
-
-        onTapped: {
-          type: Object,
-          value: null
-        },
-
-        showCancel: {
-          type: Boolean,
-          value: false
-        },
-
-        fitBottom: {
-          type: Boolean,
-          value: false,
-          observer: '_fitBottomChanged'
-        },
-
-        disableSwipe: {
-          type: Boolean,
-          value: false,
-          reflectToAttribute: true
-        }
 
       },
 
       attached: function () {
         this._defaultProperties = {
           icon: this.icon,
-          iconset: this.iconset,
           text: this.text,
           duration: this.duration,
           actionText: this.actionText,
           action2Text: this.action2Text,
           onAction: this.onAction,
           onAction2: this.onAction2,
-          onCancel: this.onCancel,
-          onTapped: this.onTapped,
-          showCancel: this.showCancel,
-          fitBottom: this.fitBottom,
-          disableSwipe: this.disableSwipe,
         };
       },
 
@@ -336,43 +296,54 @@
 
       close: function () {
         this.$.toast.close();
+
+        if(this.opened == true) {
+          this.opened = false;
+        }
       },
 
       hide: function() {
         this.$.toast.close();
       },
 
-      _cancelTapped: function (e) {
-        e.stopPropagation();
-        this._cancel(e);
-      },
-
-      _cancel: function (e) {
-        this.$.toast.close();
-        this.onCancel && this.onCancel(e);
-        this.fire('toast-cancel');
-      },
-
-
-      _onAction: function (e) {
-        e.stopPropagation();
-        this.onAction && this.onAction(e);
-        this.fire('toast-action');
-      },
-
-      _onAction2: function (e) {
-        e.stopPropagation();
-        this.onAction2 && this.onAction2(e);
-        this.fire('toast-action2');
-      },
-
-      _fitBottomChanged: function (fitBottom) {
-        if (fitBottom) {
-          this.$.toast.classList.add('fit-bottom');
-        } else {
+      _renderModeChanged: function (newValue, oldValue) {
+        var swiper = this.$.swiper;
+        // default render mode
+        if (newValue == "0") {
+          this._disableSwipe = false;
+          swiper.disabled = false;
+          this._fitBottom = false;
           this.$.toast.classList.remove('fit-bottom');
         }
+
+        // desktop render mode
+        if (newValue == "1") {
+          this._disableSwipe = true;
+          swiper.disabled = true;
+          this._fitBottom = false;
+          this.$.toast.classList.remove('fit-bottom');
+        }
+
+        // mobile render mode
+        if (newValue == "2") {
+          this._disableSwipe = false;
+          swiper.disabled = false;
+          this._fitBottom = true;
+          this.$.toast.classList.add('fit-bottom');
+        }
       },
+
+      _onAction: function (e) {
+          e.stopPropagation();
+          this.onAction && this.onAction(e);
+          this.fire('toast-action');
+        },
+
+        _onAction2: function (e) {
+          e.stopPropagation();
+          this.onAction2 && this.onAction2(e);
+          this.fire('toast-action2');
+        },
 
       _setProperties: function (properties) {
         if (properties) {
@@ -385,12 +356,8 @@
         }
       },
 
-      _getIcon: function (iconset, icon) {
-        return (iconset && icon) ? iconset + ':' + icon : '';
-      },
-
-      _hideIcon: function (icon, src) {
-        return !(icon || src);
+      _hideIcon: function (icon) {
+        return !icon;
       },
 
       __onSwiped: function (e, data) {
@@ -401,15 +368,11 @@
 
       __onClosed: function (e, data) {
         if (this._wasSwiped) {
-          this._cancel(e);
+          // this._cancel(e);
           this._wasSwiped = false;
         }
+        
         this.$.toast.style.transform = 'translate3d(0, 0, 0) rotate(0)';
-      },
-
-      __onTap: function (e) {
-        this.onTapped && this.onTapped(e);
-        this.fire('toast-tap');
       },
 
       _openedChanged: function(newValue, oldValue) {
@@ -418,6 +381,16 @@
         } else {
           this.close();
         }
+      },
+
+      _handleSysError: function(e) {
+        this.text = e.detail.data.message;
+        this.show();
+      },
+
+      _handleSysInfo: function(e) {
+        this.text = e.detail.data.message;
+        this.show();
       }
 
     });

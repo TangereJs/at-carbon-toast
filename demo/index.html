@@ -4,10 +4,8 @@
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>demo at-carbon-toast</title>
-  <script src="../webcomponentsjs/webcomponents-lite.js"></script>
-  <link rel="import" href="../at-core-style-classes/at-core-style-classes.html" />
-  <link rel="import" href="at-carbon-toast.html" />
-  <style is="custom-style" include="at-core-style-classes"></style>
+  <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+  <link rel="import" href="../at-carbon-toast.html"/>
 </head>
 
 <body class="layout-horizontal">
@@ -16,6 +14,8 @@
     <h4>at-carbon-toast demo page</h4>
     <button id="showToast" onclick="showToast();">Show toast</button>
     <button id="hideToast" onclick="hideToast();">Hide toast</button>
+    <button id="sysErrorButton" onclick="signalSysError();">Sys error</button>
+    <button id="sysInfoButton" onclick="signalSysInfo();">Sys info</button>
     <at-carbon-toast id="carbonToast" text="Lorem ipsum" icon="now:wrench"></at-carbon-toast>
   </div>
   <div class="layout-flex-4"></div>
@@ -29,6 +29,22 @@
   function hideToast() {
    var carbonToast = document.getElementById('carbonToast');
     carbonToast.hide();
+  }
+
+  function signalSysError() {
+    Polymer.signal('sys-error', {
+        data: {
+            message: 'Sys-error message'
+        }
+    });
+  }
+
+  function signalSysInfo() {
+    Polymer.signal('sys-info', {
+        data: {
+            message: 'Sys-info message'
+        }
+    });
   }
   </script>
 </body>
