@@ -57,8 +57,8 @@
           <span>[[text]]</span>
         </div>
 
-        <paper-button id="actionButton" on-tap="_onAction" hidden$="[[!actionText]]">[[actionText]]</paper-button>
-        <paper-button id="action2Button" on-tap="_onAction2" hidden$="[[!action2Text]]">[[action2Text]]</paper-button>
+        <paper-button id="actionButton" on-tap="_onAction" hidden$="[[_computeHiddenAction(actionLabel, actionSignalName)]]">[[actionLabel]]</paper-button>
+        <paper-button id="action2Button" on-tap="_onAction2" hidden$="[[_computeHiddenAction(actionLabel2, actionSignalName2)]]">[[actionLabel2]]</paper-button>
       </paper-toast>
     </div>
 
@@ -230,12 +230,12 @@
           notify: true
         },
 
-        actionText: {
+        actionLabel: {
           type: String,
           value: ''
         },
 
-        action2Text: {
+        actionLabel2: {
           type: String,
           value: ''
         },
@@ -274,8 +274,8 @@
           icon: this.icon,
           text: this.text,
           duration: this.duration,
-          actionText: this.actionText,
-          action2Text: this.action2Text,
+          actionLabel: this.actionLabel,
+          actionLabel2: this.actionLabel2,
           actionSignalName: this.actionSignalName,
           actionSignalName2: this.actionSignalName2,
         };
@@ -335,11 +335,21 @@
       },
 
       _onAction: function (e) {
-        
+        this._signalData.actionLabel = this.actionLabel;
+        this._signalData.actionSignalName = this.actionSignalName;
+
+        Polymer.signal(this.actionSignalName, {
+          data: this._signalData
+        });
       },
 
       _onAction2: function (e) {
-        
+        this._signalData.actionLabel2 = this.actionLabel2;
+        this._signalData.actionSignalName2 = this.actionSignalName2;
+
+        Polymer.signal(this.actionSignalName2, {
+          data: this._signalData
+        });
       },
 
       _setProperties: function (properties) {
@@ -355,6 +365,14 @@
 
       _hideIcon: function (icon) {
         return !icon;
+      },
+
+      _computeHiddenAction: function (label, signalName) {
+        if(label != '' && signalName != '') {
+          return false;
+        } else {
+          return true;
+        }
       },
 
       __onSwiped: function (e, data) {
