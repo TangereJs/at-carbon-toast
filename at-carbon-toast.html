@@ -41,8 +41,8 @@
     <div id="container">
       <iron-swipeable-container id="swiper" on-iron-swipe="__onSwiped"> </iron-swipeable-container>
 
-      <at-carbon-toast-message id="toast" class="plg layout-horizontal layout-center" duration="[[duration]]" on-toast-message-closed="__onClosed">
-        <at-carbon-icon id="mainIcon" class="prlg" icon="[[icon]]" hidden$="[[_hideIcon(icon)]]"></at-carbon-icon>
+      <at-carbon-toast-message id="toast" class="p layout-horizontal layout-center" duration="[[duration]]" on-toast-message-closed="__onClosed">
+        <at-carbon-icon id="mainIcon" class="pr" icon="[[icon]]" hidden$="[[_hideIcon(icon)]]"></at-carbon-icon>
 
         <div class="content-container">
           <slot></slot>
@@ -161,7 +161,8 @@
          */
         icon: {
           type: String,
-          value: "now:info"
+          value: "now:info",
+          observer: "_iconChanged"
         },
 
         /**
@@ -329,19 +330,15 @@
       _onAction: function (e) {
         this._signalData.actionLabel = this.actionLabel;
         this._signalData.actionSignalName = this.actionSignalName;
-
-        Polymer.signal(this.actionSignalName, {
-          data: this._signalData
-        });
+        var signalData = this._signalData;
+        Polymer.signal(this.actionSignalName, { signalData });
       },
 
       _onAction2: function (e) {
         this._signalData.actionLabel2 = this.actionLabel2;
         this._signalData.actionSignalName2 = this.actionSignalName2;
-
-        Polymer.signal(this.actionSignalName2, {
-          data: this._signalData
-        });
+        var signalData = this._signalData;
+        Polymer.signal(this.actionSignalName2, { signalData });
       },
 
       _setProperties: function (properties) {
@@ -357,6 +354,20 @@
 
       _hideIcon: function (icon) {
         return !icon;
+      },
+
+      _iconChanged: function(newValue, oldValue) {
+        var icon = this.$.mainIcon;
+        icon.classList.remove('red');
+        icon.classList.remove('yellow');
+
+        if(newValue == "now:error") {
+          icon.classList.add('red');
+        }
+
+        if(newValue == "now:warning") {
+          icon.classList.add('yellow');
+        }
       },
 
       _computeHiddenAction: function (label, signalName) {
@@ -391,26 +402,26 @@
       },
 
       _handleSysError: function(e) {
-        console.error(e.detail.data.message);
-        this._signalData = e.detail.data;
+        console.error(e.detail.message);
+        this._signalData = e.detail;
         this.icon = 'now:error';
-        this.text = e.detail.data.message;
+        this.text = e.detail.message;
         this.show();
       },
 
       _handleSysInfo: function(e) {
-        console.info(e.detail.data.message);
-        this._signalData = e.detail.data;
+        console.info(e.detail.message);
+        this._signalData = e.detail;
         this.icon = 'now:info';
-        this.text = e.detail.data.message;
+        this.text = e.detail.message;
         this.show();
       },
 
       _handleSysWarning: function(e) {
-        console.warn(e.detail.data.message);
-        this._signalData = e.detail.data;
+        console.warn(e.detail.message);
+        this._signalData = e.detail;
         this.icon = 'now:warning';
-        this.text = e.detail.data.message;
+        this.text = e.detail.message;
         this.show();
       }
 
