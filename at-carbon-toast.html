@@ -1,7 +1,8 @@
 <link rel="import" href="../tangere/tangere.html" />
 <link rel="import" href="../at-carbon-icon/at-carbon-icon.html" />
 <link rel="import" href="../at-core-signals/at-core-signals.html"/>
-<link rel="import" href="../paper-toast/paper-toast.html" />
+<link rel="import" href="../at-carbon-toast/at-carbon-toast-message.html"/>
+<link rel="import" href="../at-core-style-classes/at-core-style-classes.html"/>
 <link rel="import" href="../paper-button/paper-button.html" />
 <link rel="import" href="../paper-styles/paper-styles.html"/>
 <link rel="import" href="../iron-flex-layout/iron-flex-layout.html"/>
@@ -9,6 +10,7 @@
 
 <dom-module id="at-carbon-toast">
   <template strip-whitespace>
+    <style include="at-core-style-classes"></style>
     <style>
       :host:not([disable-swipe]) iron-swipeable-container {
         -moz-user-select: none;
@@ -18,13 +20,10 @@
         cursor: default;
       }
 
-      paper-toast {
+      at-carbon-toast-message {
         @apply --paper-font-body2;
-        @apply --layout-horizontal;
-        @apply --layout-center;
         color: var(--paper-toast-color, #f1f1f1);
         background-color: var(--paper-toast-background-color, #323232);
-        @apply --app-toast;
       }
 
       .content-container {
@@ -34,13 +33,6 @@
 
       paper-button {
         color: var(--accent-color);
-        @apply --app-toast-button;
-      }
-
-      #mainIcon {
-        margin-right: 4px;
-        @apply --app-toast-main-icon;
-        --iron-icon-stroke-color: var(--app-toast-main-icon-stroke-color);
       }
   </style>
 
@@ -49,8 +41,8 @@
     <div id="container">
       <iron-swipeable-container id="swiper" on-iron-swipe="__onSwiped"> </iron-swipeable-container>
 
-      <paper-toast id="toast" duration="[[duration]]" on-iron-overlay-closed="__onClosed">
-        <at-carbon-icon id="mainIcon" icon="[[icon]]" hidden$="[[_hideIcon(icon)]]"></at-carbon-icon>
+      <at-carbon-toast-message id="toast" class="plg layout-horizontal layout-center" duration="[[duration]]" on-toast-message-closed="__onClosed">
+        <at-carbon-icon id="mainIcon" class="prlg" icon="[[icon]]" hidden$="[[_hideIcon(icon)]]"></at-carbon-icon>
 
         <div class="content-container">
           <slot></slot>
@@ -59,7 +51,7 @@
 
         <paper-button id="actionButton" on-tap="_onAction" hidden$="[[_computeHiddenAction(actionLabel, actionSignalName)]]">[[actionLabel]]</paper-button>
         <paper-button id="action2Button" on-tap="_onAction2" hidden$="[[_computeHiddenAction(actionLabel2, actionSignalName2)]]">[[actionLabel2]]</paper-button>
-      </paper-toast>
+      </at-carbon-toast-message>
     </div>
 
   </template>
@@ -386,8 +378,8 @@
           // this._cancel(e);
           this._wasSwiped = false;
         }
-        
-        this.$.toast.style.transform = 'translate3d(0, 0, 0) rotate(0)';
+
+        this.opened = false;
       },
 
       _openedChanged: function(newValue, oldValue) {
