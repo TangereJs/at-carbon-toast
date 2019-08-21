@@ -16,6 +16,7 @@
     <button id="hideToast" onclick="hideToast();">Hide toast</button>
     <button id="sysErrorButton" onclick="signalSysError();">Sys error</button>
     <button id="sysInfoButton" onclick="signalSysInfo();">Sys info</button>
+    <button id="sysWarningButton" onclick="signalSysWarning();">Sys warning</button>
     <at-carbon-toast id="carbonToast" text="Lorem ipsum" icon="now:wrench"></at-carbon-toast>
   </div>
   <div class="layout-flex-4"></div>
@@ -43,6 +44,14 @@
     Polymer.signal('sys-info', {
         data: {
             message: 'Sys-info message'
+        }
+    });
+  }
+
+  function signalSysWarning() {
+    Polymer.signal('sys-warning', {
+        data: {
+            message: 'Sys-warning message'
         }
     });
   }

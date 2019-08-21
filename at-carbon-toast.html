@@ -44,7 +44,7 @@
       }
   </style>
 
-    <at-core-signals id="coreSignals" on-sys-error="_handleSysError" on-sys-info="_handleSysInfo"></at-core-signals>
+    <at-core-signals id="coreSignals" on-sys-error="_handleSysError" on-sys-info="_handleSysInfo" on-sys-warning="_handleSysWarning"></at-core-signals>
 
     <div id="container">
       <iron-swipeable-container id="swiper" on-iron-swipe="__onSwiped"> </iron-swipeable-container>
@@ -169,7 +169,7 @@
          */
         icon: {
           type: String,
-          value: ""
+          value: "now:info"
         },
 
         /**
@@ -231,24 +231,24 @@
         },
 
         actionText: {
-            type: String,
-            value: ''
-          },
+          type: String,
+          value: ''
+        },
 
-          action2Text: {
-            type: String,
-            value: ''
-          },
+        action2Text: {
+          type: String,
+          value: ''
+        },
 
-          onAction: {
-            type: Object,
-            value: null
-          },
+        actionSignalName: {
+          type: String,
+          value: ''
+        },
 
-          onAction2: {
-            type: Object,
-            value: null
-          },
+        actionSignalName2: {
+          type: String,
+          value: ''
+        },
 
         renderMode: {
           type: String,
@@ -276,8 +276,8 @@
           duration: this.duration,
           actionText: this.actionText,
           action2Text: this.action2Text,
-          onAction: this.onAction,
-          onAction2: this.onAction2,
+          actionSignalName: this.actionSignalName,
+          actionSignalName2: this.actionSignalName2,
         };
       },
 
@@ -308,12 +308,13 @@
 
       _renderModeChanged: function (newValue, oldValue) {
         var swiper = this.$.swiper;
-        // default render mode
+        // auto - if mobile == true -> behave like mobile, otherwise -> behave like desktop
         if (newValue == "0") {
-          this._disableSwipe = false;
-          swiper.disabled = false;
-          this._fitBottom = false;
-          this.$.toast.classList.remove('fit-bottom');
+          if(Tangere.session.browser.mobile == true) {
+            newValue = 2;
+          } else {
+            newValue = 1;
+          }
         }
 
         // desktop render mode
@@ -334,16 +335,12 @@
       },
 
       _onAction: function (e) {
-          e.stopPropagation();
-          this.onAction && this.onAction(e);
-          this.fire('toast-action');
-        },
+        
+      },
 
-        _onAction2: function (e) {
-          e.stopPropagation();
-          this.onAction2 && this.onAction2(e);
-          this.fire('toast-action2');
-        },
+      _onAction2: function (e) {
+        
+      },
 
       _setProperties: function (properties) {
         if (properties) {
@@ -384,11 +381,25 @@
       },
 
       _handleSysError: function(e) {
+        console.error(e.detail.data.message);
+        this._signalData = e.detail.data;
+        this.icon = 'now:error';
         this.text = e.detail.data.message;
         this.show();
       },
 
       _handleSysInfo: function(e) {
+        console.info(e.detail.data.message);
+        this._signalData = e.detail.data;
+        this.icon = 'now:info';
+        this.text = e.detail.data.message;
+        this.show();
+      },
+
+      _handleSysWarning: function(e) {
+        console.warn(e.detail.data.message);
+        this._signalData = e.detail.data;
+        this.icon = 'now:warning';
         this.text = e.detail.data.message;
         this.show();
       }
