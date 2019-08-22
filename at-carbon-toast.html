@@ -1,11 +1,11 @@
 <link rel="import" href="../tangere/tangere.html" />
 <link rel="import" href="../at-carbon-icon/at-carbon-icon.html" />
-<link rel="import" href="../at-core-signals/at-core-signals.html"/>
-<link rel="import" href="../at-carbon-toast/at-carbon-toast-message.html"/>
-<link rel="import" href="../at-core-style-classes/at-core-style-classes.html"/>
+<link rel="import" href="../at-core-signals/at-core-signals.html" />
+<link rel="import" href="../at-carbon-toast/at-carbon-toast-message.html" />
+<link rel="import" href="../at-core-style-classes/at-core-style-classes.html" />
 <link rel="import" href="../paper-button/paper-button.html" />
-<link rel="import" href="../paper-styles/paper-styles.html"/>
-<link rel="import" href="../iron-flex-layout/iron-flex-layout.html"/>
+<link rel="import" href="../paper-styles/paper-styles.html" />
+<link rel="import" href="../iron-flex-layout/iron-flex-layout.html" />
 <link rel="import" href="../iron-swipeable-container/iron-swipeable-container.html" />
 
 <dom-module id="at-carbon-toast">
@@ -34,7 +34,7 @@
       paper-button {
         color: var(--accent-color);
       }
-  </style>
+    </style>
 
     <at-core-signals id="coreSignals" on-sys-error="_handleSysError" on-sys-info="_handleSysInfo" on-sys-warning="_handleSysWarning"></at-core-signals>
 
@@ -42,9 +42,9 @@
       <iron-swipeable-container id="swiper" on-iron-swipe="__onSwiped"> </iron-swipeable-container>
 
       <at-carbon-toast-message id="toast" class="p layout-horizontal layout-center" duration="[[duration]]" on-toast-message-closed="__onClosed">
-        <at-carbon-icon id="mainIcon" class="mr" icon="[[icon]]" hidden$="[[_hideIcon(icon)]]"></at-carbon-icon>
+        <at-carbon-icon id="mainIcon" icon="[[icon]]" hidden$="[[_hideIcon(icon)]]"></at-carbon-icon>
 
-        <div class="content-container">
+        <div class="content-container pl">
           <slot></slot>
           <span>[[text]]</span>
         </div>
@@ -77,7 +77,7 @@
          *
          * @property toastPosition
          * @type String
-         * @default bottomLeft 
+         * @default bottomLeft
          */
         // position is renamed to toast position because ironfitbehavior has position function and that function takes over if toastPosition is named position
         toastPosition: {
@@ -110,7 +110,7 @@
 
         /**
          * animation used when toast is shown
-         * 
+         *
          * @property showAnimation
          * @type string
          * @default fadeInUp
@@ -154,10 +154,10 @@
 
         /**
          * now:icon to be displyed to the left of message text
-         * 
+         *
          * @property icon
          * @type String
-         * @default "" 
+         * @default ""
          */
         icon: {
           type: String,
@@ -172,7 +172,7 @@
          */
         duration: {
           type: Number,
-          value: 3000
+          value: 5000
         },
 
         /**
@@ -403,24 +403,24 @@
 
       _handleSysError: function(e) {
         console.error(e.detail.message);
-        this._signalData = e.detail;
         this.icon = 'now:error';
-        this.text = e.detail.message;
-        this.show();
+        this._signalShow(e);
       },
 
       _handleSysInfo: function(e) {
         console.info(e.detail.message);
-        this._signalData = e.detail;
         this.icon = 'now:info';
-        this.text = e.detail.message;
-        this.show();
+        this._signalShow(e);
       },
 
       _handleSysWarning: function(e) {
         console.warn(e.detail.message);
-        this._signalData = e.detail;
         this.icon = 'now:warning';
+        this._signalShow(e);
+      },
+
+      _signalShow: function(e) {
+        this._signalData = e.detail;
         this.text = e.detail.message;
         this.show();
       }
