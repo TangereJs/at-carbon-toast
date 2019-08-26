@@ -39,23 +39,21 @@
 
     <at-carbon-alert id="alert" raw-html="[[details]]"></at-carbon-alert>
 
-
     <at-core-signals id="coreSignals" on-sys-error="_handleSysError" on-sys-info="_handleSysInfo" on-sys-warning="_handleSysWarning" on-sys-success="_handleSysSuccess"></at-core-signals>
-
 
     <div id="container">
       <iron-swipeable-container id="swiper" on-iron-swipe="__onSwiped"> </iron-swipeable-container>
 
       <at-carbon-toast-message id="toast" class="p layout-horizontal layout-center" duration="[[duration]]" dismiss="[[dismiss]]" on-toast-message-closed="__onClosed">
-        <at-carbon-icon id="mainIcon" icon="[[icon]]" hidden$="[[_hideIcon(icon)]]"></at-carbon-icon>
+        <at-carbon-icon id="mainIcon" class$="[[_computeColorClass(icon)]]" icon="[[icon]]" hidden$="[[_hideIcon(icon)]]"></at-carbon-icon>
 
         <div class="content-container pl">
           <slot></slot>
           <span>[[text]]</span>
         </div>
 
-        <paper-button id="actionButton" on-tap="_onAction" hidden$="[[_computeHiddenAction(actionLabel, actionSignalName)]]">[[actionLabel]]</paper-button>
-        <paper-button id="action2Button" on-tap="_onAction2" hidden$="[[_computeHiddenAction(actionLabel2, actionSignalName2)]]">[[actionLabel2]]</paper-button>
+        <paper-button id="actionButton" class$="[[_computeColorClass(icon)]]" on-tap="_onAction" hidden$="[[_computeHiddenAction(actionLabel, actionSignalName)]]">[[actionLabel]]</paper-button>
+        <paper-button id="action2Button" class$="[[_computeColorClass(icon)]]" on-tap="_onAction2" hidden$="[[_computeHiddenAction(actionLabel2, actionSignalName2)]]">[[actionLabel2]]</paper-button>
       </at-carbon-toast-message>
     </div>
 
@@ -167,7 +165,6 @@
         icon: {
           type: String,
           value: "now:info",
-          observer: "_iconChanged"
         },
 
         /**
@@ -323,7 +320,7 @@
       _renderModeChanged: function (newValue, oldValue) {
         var swiper = this.$.swiper;
         // auto - if mobile == true -> behave like mobile, otherwise -> behave like desktop
-        if (newValue == "0") {
+        if (newValue == '0') {
           if(Tangere.session.browser.mobile == true) {
             newValue = 2;
           } else {
@@ -332,7 +329,7 @@
         }
 
         // desktop render mode
-        if (newValue == "1") {
+        if (newValue == '1') {
           this._disableSwipe = true;
           swiper.disabled = true;
           this._fitBottom = false;
@@ -340,7 +337,7 @@
         }
 
         // mobile render mode
-        if (newValue == "2") {
+        if (newValue == '2') {
           this._disableSwipe = false;
           swiper.disabled = false;
           this._fitBottom = true;
@@ -350,8 +347,13 @@
 
       _dismissChanged: function (newValue, oldValue) {
         if(newValue == true) {
-          this.actionLabel2 = "Dismiss";
-          this.actionSignalName2 = "_dismiss";
+          this.actionLabel2 = 'Dismiss';
+          this.actionSignalName2 = '_dismiss';
+        }
+
+        if(newValue == false) {
+          this.actionLabel2 = '';
+          this.actionSignalName2 = '';
         }
       },
 
@@ -360,10 +362,15 @@
           this.actionLabel = 'Details';
           this.actionSignalName = '_details';
         }
+
+        if(newValue == '') {
+          this.actionLabel = '';
+          this.actionSignalName = '';
+        }
       },
 
       _onAction: function (e) {
-        if(this.actionSignalName == "_details") {
+        if(this.actionSignalName == '_details') {
           var alert = this.$.alert;
           alert.open();
         } else {
@@ -375,7 +382,7 @@
       },
 
       _onAction2: function (e) {
-        if(this.actionSignalName2 == "_dismiss") {
+        if(this.actionSignalName2 == '_dismiss') {
           this.close();
         } else {
           this._signalData.actionLabel2 = this.actionLabel2;
@@ -400,22 +407,23 @@
         return !icon;
       },
 
-      _iconChanged: function(newValue, oldValue) {
-        var icon = this.$.mainIcon;
-        icon.classList.remove('red');
-        icon.classList.remove('yellow');
-        icon.classList.remove('green');
-
-        if(newValue == "now:error") {
-          icon.classList.add('red');
+      // since both icon and action text colors have to be the same, and both depend on icon's name to calculate the color 
+      // we can use only this function to calculate the color class
+      _computeColorClass: function(icon) {
+        if(icon == 'now:error') {
+          return ' red';
         }
 
-        if(newValue == "now:warning") {
-          icon.classList.add('yellow');
+        if(icon == 'now:warning') {
+          return ' yellow';
         }
 
-        if(newValue == "now:checkmark") {
-          icon.classList.add('green');
+        if(icon == 'now:checkmark') {
+          return ' green';
+        }
+
+        if(icon == 'now:info') {
+          return ' white';
         }
       },
 
@@ -452,25 +460,21 @@
 
       _handleSysError: function(e) {
         console.error(e.detail.message);
-        this._setDismissFromSignal(e);
         this._signalShow(e);
       },
 
       _handleSysInfo: function(e) {
         console.info(e.detail.message);
-        this._setDismissFromSignal(e);
         this._signalShow(e);
       },
 
       _handleSysWarning: function(e) {
         console.warn(e.detail.message);
-        this._setDismissFromSignal(e);
         this._signalShow(e);
       },
 
       _handleSysSuccess: function(e) {
         console.info(e.detail.message);
-        this._setDismissFromSignal(e);
         this._signalShow(e);
       },
 
@@ -497,6 +501,7 @@
       },
 
       _signalShow: function(e) {
+        this._setDismissFromSignal(e);
         this._signalData = e.detail;
         this.details = e.detail.details;
         this.icon = e.detail.icon;
