@@ -165,7 +165,9 @@ In order to apply the `Roboto` font to this element, make sure you've imported `
          * Set to true to disable auto-focusing the toast or child nodes with
          * the `autofocus` attribute` when the overlay is opened.
          */
-        noAutoFocus: {type: Boolean, value: true}
+        noAutoFocus: {type: Boolean, value: true},
+
+        dismiss: {type: Boolean, value: false}
       },
 
       listeners: {'transitionend': '__onTransitionEnd'},
@@ -185,7 +187,7 @@ In order to apply the `Roboto` font to this element, make sure you've imported `
        * @property _canAutoClose
        */
       get _canAutoClose() {
-        return this.duration > 0 && this.duration !== Infinity;
+        return this.duration > 0 && this.duration !== Infinity && this.dismiss == false;
       },
 
       created: function() {

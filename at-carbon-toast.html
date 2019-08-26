@@ -3,6 +3,7 @@
 <link rel="import" href="../at-core-signals/at-core-signals.html" />
 <link rel="import" href="../at-carbon-toast/at-carbon-toast-message.html" />
 <link rel="import" href="../at-core-style-classes/at-core-style-classes.html" />
+<link rel="import" href="../at-carbon-alert/at-carbon-alert.html">
 <link rel="import" href="../paper-button/paper-button.html" />
 <link rel="import" href="../paper-styles/paper-styles.html" />
 <link rel="import" href="../iron-flex-layout/iron-flex-layout.html" />
@@ -36,12 +37,16 @@
       }
     </style>
 
-    <at-core-signals id="coreSignals" on-sys-error="_handleSysError" on-sys-info="_handleSysInfo" on-sys-warning="_handleSysWarning"></at-core-signals>
+    <at-carbon-alert id="alert" raw-html="[[details]]"></at-carbon-alert>
+
+
+    <at-core-signals id="coreSignals" on-sys-error="_handleSysError" on-sys-info="_handleSysInfo" on-sys-warning="_handleSysWarning" on-sys-success="_handleSysSuccess"></at-core-signals>
+
 
     <div id="container">
       <iron-swipeable-container id="swiper" on-iron-swipe="__onSwiped"> </iron-swipeable-container>
 
-      <at-carbon-toast-message id="toast" class="p layout-horizontal layout-center" duration="[[duration]]" on-toast-message-closed="__onClosed">
+      <at-carbon-toast-message id="toast" class="p layout-horizontal layout-center" duration="[[duration]]" dismiss="[[dismiss]]" on-toast-message-closed="__onClosed">
         <at-carbon-icon id="mainIcon" icon="[[icon]]" hidden$="[[_hideIcon(icon)]]"></at-carbon-icon>
 
         <div class="content-container pl">
@@ -260,6 +265,20 @@
           }],
         },
 
+        dismiss: {
+          type: Boolean,
+          value: false,
+          observer: '_dismissChanged'
+        },
+
+        details: {
+          type: String,
+          value: '',
+          xtype: 'code',
+          mode: "html",
+          observer: "_detailsChanged"
+        },
+
       },
 
       attached: function () {
@@ -271,6 +290,8 @@
           actionLabel2: this.actionLabel2,
           actionSignalName: this.actionSignalName,
           actionSignalName2: this.actionSignalName2,
+          details: this.details,
+          dismiss: this.dismiss
         };
       },
 
@@ -327,18 +348,41 @@
         }
       },
 
+      _dismissChanged: function (newValue, oldValue) {
+        if(newValue == true) {
+          this.actionLabel2 = "Dismiss";
+          this.actionSignalName2 = "_dismiss";
+        }
+      },
+
+      _detailsChanged: function (newValue, oldValue) {
+        if(newValue != '') {
+          this.actionLabel = 'Details';
+          this.actionSignalName = '_details';
+        }
+      },
+
       _onAction: function (e) {
-        this._signalData.actionLabel = this.actionLabel;
-        this._signalData.actionSignalName = this.actionSignalName;
-        var signalData = this._signalData;
-        Polymer.signal(this.actionSignalName, { signalData });
+        if(this.actionSignalName == "_details") {
+          var alert = this.$.alert;
+          alert.open();
+        } else {
+          this._signalData.actionLabel = this.actionLabel;
+          this._signalData.actionSignalName = this.actionSignalName;
+          var signalData = this._signalData;
+         Polymer.signal(this.actionSignalName, { signalData });
+        }
       },
 
       _onAction2: function (e) {
-        this._signalData.actionLabel2 = this.actionLabel2;
-        this._signalData.actionSignalName2 = this.actionSignalName2;
-        var signalData = this._signalData;
-        Polymer.signal(this.actionSignalName2, { signalData });
+        if(this.actionSignalName2 == "_dismiss") {
+          this.close();
+        } else {
+          this._signalData.actionLabel2 = this.actionLabel2;
+          this._signalData.actionSignalName2 = this.actionSignalName2;
+          var signalData = this._signalData;
+          Polymer.signal(this.actionSignalName2, { signalData });
+        }
       },
 
       _setProperties: function (properties) {
@@ -360,6 +404,7 @@
         var icon = this.$.mainIcon;
         icon.classList.remove('red');
         icon.classList.remove('yellow');
+        icon.classList.remove('green');
 
         if(newValue == "now:error") {
           icon.classList.add('red');
@@ -367,6 +412,10 @@
 
         if(newValue == "now:warning") {
           icon.classList.add('yellow');
+        }
+
+        if(newValue == "now:checkmark") {
+          icon.classList.add('green');
         }
       },
 
@@ -403,24 +452,29 @@
 
       _handleSysError: function(e) {
         console.error(e.detail.message);
-        this.icon = 'now:error';
         this._signalShow(e);
       },
 
       _handleSysInfo: function(e) {
         console.info(e.detail.message);
-        this.icon = 'now:info';
         this._signalShow(e);
       },
 
       _handleSysWarning: function(e) {
         console.warn(e.detail.message);
-        this.icon = 'now:warning';
+        this._signalShow(e);
+      },
+
+      _handleSysSuccess: function(e) {
+        console.info(e.detail.message);
         this._signalShow(e);
       },
 
       _signalShow: function(e) {
         this._signalData = e.detail;
+        this.dismiss = e.detail.dismiss;
+        this.details = e.detail.details;
+        this.icon = e.detail.icon;
         this.text = e.detail.message;
         this.show();
       }
