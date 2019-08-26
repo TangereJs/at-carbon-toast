@@ -459,23 +459,50 @@
       },
 
       _handleSysError: function(e) {
-        console.error(e.detail.message + ' ' + e.detail.details);
         this._signalShow(e);
       },
 
       _handleSysInfo: function(e) {
-        console.info(e.detail.message + ' ' + e.detail.details);
         this._signalShow(e);
       },
 
       _handleSysWarning: function(e) {
-        console.warn(e.detail.message + ' ' + e.detail.details);
         this._signalShow(e);
       },
 
       _handleSysSuccess: function(e) {
-        console.info(e.detail.message + ' ' + e.detail.details);
         this._signalShow(e);
+      },
+
+      _logSignalDetails: function(e) {
+        var logMessage = '';
+        var signalType = e.type;
+
+        if(e.detail.message != undefined) {
+          logMessage += e.detail.message;
+        }
+
+        if(e.detail.details != undefined) {
+          logMessage += " " + e.detail.details;
+        }
+
+        if (logMessage != '') {
+          if (signalType == 'sys-error') {
+            console.error(logMessage);
+          }
+
+          if (signalType == 'sys-info') {
+            console.info(logMessage);
+          }
+
+          if (signalType == 'sys-warning') {
+            console.warn(logMessage);
+          }
+
+          if (signalType == 'sys-success') {
+            console.info(logMessage);
+          }
+        }
       },
 
       _setDismissFromSignal: function(e) {
@@ -500,12 +527,42 @@
         }
       },
 
+      _setIconFromSignal: function(e) {
+        // each signal has it's default icon which is used if an icon is not provided
+        var signalType = e.type;
+
+        if(e.detail.icon == undefined) {
+          if(signalType == 'sys-error') {
+            this.icon = 'now:error';
+          }
+
+          if(signalType == 'sys-info') {
+            this.icon = 'now:info';
+          }
+
+          if(signalType == 'sys-warning') {
+            this.icon = 'now:warning';
+          }
+
+          if(signalType == 'sys-success') {
+            this.icon = 'now:checkmark';
+          }
+        } else {
+          this.icon = e.detail.icon;
+        }
+      },
+
       _signalShow: function(e) {
         this._setDismissFromSignal(e);
+        this._setIconFromSignal(e);
+        this._logSignalDetails(e);
         this._signalData = e.detail;
 
         if(e.detail.details != undefined) {
           this.details = e.detail.details;
+        } else {
+          // clears previous values if there were any
+          this.details = '';
         }
 
         if(e.detail.icon != undefined) {
@@ -514,6 +571,9 @@
 
         if(e.detail.message != undefined) {
           this.text = e.detail.message;
+        } else {
+          // clears previous values if there were any
+          this.text = '';
         }
         
         this.show();
