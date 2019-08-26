@@ -452,27 +452,52 @@
 
       _handleSysError: function(e) {
         console.error(e.detail.message);
+        this._setDismissFromSignal(e);
         this._signalShow(e);
       },
 
       _handleSysInfo: function(e) {
         console.info(e.detail.message);
+        this._setDismissFromSignal(e);
         this._signalShow(e);
       },
 
       _handleSysWarning: function(e) {
         console.warn(e.detail.message);
+        this._setDismissFromSignal(e);
         this._signalShow(e);
       },
 
       _handleSysSuccess: function(e) {
         console.info(e.detail.message);
+        this._setDismissFromSignal(e);
         this._signalShow(e);
+      },
+
+      _setDismissFromSignal: function(e) {
+        var signalType = e.type;
+
+        // error signal should set dismiss to true by default (unless the data contains dismiss: false)
+        if(signalType == 'sys-error') {
+          if(e.detail.dismiss == false) {
+            this.dismiss = false;
+          } else {
+            this.dismiss = true;
+          }
+        }
+
+        // all other signals dismiss is false (unless data contains dismiss: true)
+        if(signalType == 'sys-info' || signalType == 'sys-warning' || signalType == 'sys-success') {
+          if(e.detail.dismiss == true) {
+            this.dismiss = true;
+          } else {
+            this.dismiss = false;
+          }
+        }
       },
 
       _signalShow: function(e) {
         this._signalData = e.detail;
-        this.dismiss = e.detail.dismiss;
         this.details = e.detail.details;
         this.icon = e.detail.icon;
         this.text = e.detail.message;
