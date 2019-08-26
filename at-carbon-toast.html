@@ -459,22 +459,22 @@
       },
 
       _handleSysError: function(e) {
-        console.error(e.detail.message);
+        console.error(e.detail.message + ' ' + e.detail.details);
         this._signalShow(e);
       },
 
       _handleSysInfo: function(e) {
-        console.info(e.detail.message);
+        console.info(e.detail.message + ' ' + e.detail.details);
         this._signalShow(e);
       },
 
       _handleSysWarning: function(e) {
-        console.warn(e.detail.message);
+        console.warn(e.detail.message + ' ' + e.detail.details);
         this._signalShow(e);
       },
 
       _handleSysSuccess: function(e) {
-        console.info(e.detail.message);
+        console.info(e.detail.message + ' ' + e.detail.details);
         this._signalShow(e);
       },
 
@@ -503,9 +503,19 @@
       _signalShow: function(e) {
         this._setDismissFromSignal(e);
         this._signalData = e.detail;
-        this.details = e.detail.details;
-        this.icon = e.detail.icon;
-        this.text = e.detail.message;
+
+        if(e.detail.details != undefined) {
+          this.details = e.detail.details;
+        }
+
+        if(e.detail.icon != undefined) {
+          this.icon = e.detail.icon;
+        }
+
+        if(e.detail.message != undefined) {
+          this.text = e.detail.message;
+        }
+        
         this.show();
       }
 
