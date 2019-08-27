@@ -45,15 +45,15 @@
       <iron-swipeable-container id="swiper" on-iron-swipe="__onSwiped"> </iron-swipeable-container>
 
       <at-carbon-toast-message id="toast" class="p layout-horizontal layout-center" duration="[[duration]]" dismiss="[[dismiss]]" on-toast-message-closed="__onClosed">
-        <at-carbon-icon id="mainIcon" class$="[[_computeColorClass(icon)]]" icon="[[icon]]" hidden$="[[_hideIcon(icon)]]"></at-carbon-icon>
+        <at-carbon-icon id="mainIcon" class$="[[color]]" icon="[[icon]]" hidden$="[[_hideIcon(icon)]]"></at-carbon-icon>
 
         <div class="content-container pl">
           <slot></slot>
           <span>[[text]]</span>
         </div>
 
-        <paper-button id="actionButton" class$="[[_computeColorClass(icon)]]" on-tap="_onAction" hidden$="[[_computeHiddenAction(actionLabel, actionSignalName)]]">[[actionLabel]]</paper-button>
-        <paper-button id="action2Button" class$="[[_computeColorClass(icon)]]" on-tap="_onAction2" hidden$="[[_computeHiddenAction(actionLabel2, actionSignalName2)]]">[[actionLabel2]]</paper-button>
+        <paper-button id="actionButton" class$="[[color]]" on-tap="_onAction" hidden$="[[_computeHiddenAction(actionLabel, actionSignalName)]]">[[actionLabel]]</paper-button>
+        <paper-button id="action2Button" class$="[[color]]" on-tap="_onAction2" hidden$="[[_computeHiddenAction(actionLabel2, actionSignalName2)]]">[[actionLabel2]]</paper-button>
       </at-carbon-toast-message>
     </div>
 
@@ -276,6 +276,11 @@
           observer: "_detailsChanged"
         },
 
+        color: {
+          type: String,
+          value: '',
+        }
+
       },
 
       attached: function () {
@@ -288,7 +293,8 @@
           actionSignalName: this.actionSignalName,
           actionSignalName2: this.actionSignalName2,
           details: this.details,
-          dismiss: this.dismiss
+          dismiss: this.dismiss,
+          color: this.color
         };
       },
 
@@ -405,26 +411,6 @@
 
       _hideIcon: function (icon) {
         return !icon;
-      },
-
-      // since both icon and action text colors have to be the same, and both depend on icon's name to calculate the color 
-      // we can use only this function to calculate the color class
-      _computeColorClass: function(icon) {
-        if(icon == 'now:error') {
-          return ' red';
-        }
-
-        if(icon == 'now:warning') {
-          return ' yellow';
-        }
-
-        if(icon == 'now:checkmark') {
-          return ' green';
-        }
-
-        if(icon == 'now:info') {
-          return ' white';
-        }
       },
 
       _computeHiddenAction: function (label, signalName) {
@@ -552,9 +538,36 @@
         }
       },
 
+      _setColorFromSignal: function(e) {
+        // each signal has it's default color which is used if a color is not provided
+        var signalType = e.type;
+
+        if(e.detail.color == undefined) {
+          if(signalType == 'sys-error') {
+            this.color = 'red';
+          }
+
+          if(signalType == 'sys-info') {
+            this.color = 'white';
+          }
+
+          if(signalType == 'sys-warning') {
+            this.color = 'yellow';
+          }
+
+          if(signalType == 'sys-success') {
+            this.color = 'green';
+          }
+        } else {
+          this.color = e.detail.color;
+        }
+      },
+    
+
       _signalShow: function(e) {
         this._setDismissFromSignal(e);
         this._setIconFromSignal(e);
+        this._setColorFromSignal(e);
         this._logSignalDetails(e);
         this._signalData = e.detail;
 
@@ -564,18 +577,14 @@
           // clears previous values if there were any
           this.details = '';
         }
-
-        if(e.detail.icon != undefined) {
-          this.icon = e.detail.icon;
-        }
-
+        
         if(e.detail.message != undefined) {
           this.text = e.detail.message;
         } else {
           // clears previous values if there were any
           this.text = '';
         }
-        
+
         this.show();
       }
 
