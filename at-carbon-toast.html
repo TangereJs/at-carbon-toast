@@ -36,9 +36,6 @@
         color: var(--accent-color);
       }
 
-      #toast {
-        z-index: 103000;
-      }
     </style>
 
     <at-carbon-alert id="alert" raw-html="[[details]]"></at-carbon-alert>
@@ -308,6 +305,7 @@
 
       show: function(properties) {
         this._setProperties(properties);
+        this.$.toast.style.zIndex = Tangere.layerZIndex() + 10000;
         this.$.toast.style.opacity = 1;
         Polymer.dom(this.$.swiper).appendChild(this.$.toast);
         this.$.toast.show(properties);
