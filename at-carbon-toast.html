@@ -305,9 +305,9 @@
 
       show: function(properties) {
         this._setProperties(properties);
-        this.$.toast.style.zIndex = Tangere.layerZIndex() + 10000;
         this.$.toast.style.opacity = 1;
         Polymer.dom(this.$.swiper).appendChild(this.$.toast);
+        this.$.toast.style.zIndex = Tangere.layerZIndex() + 10000;
         this.$.toast.show(properties);
       },
 
